@@ -41,7 +41,7 @@ def extract_owner_from_text(text):
     
     {text}
     
-    Please provide the name in the format: "Owner: [Name]".
+    Please provide the name in the format: "Owner: [Name]". 
     """
 
 
@@ -83,6 +83,7 @@ def scrape_website(url):
             contact_text += tag.get_text(separator=" ", strip=True) + " "
     
     # Analyze the extracted text
+   with measure_time("Extracting owner info"):  
     owner_info = ""
     if about_us_text:
         owner_info += extract_owner_from_text(about_us_text) + "\n"
@@ -99,6 +100,6 @@ def scrape_website(url):
     return owner_info
 
 # Example usage
-url = 'https://www.coventry.gov.uk/'
+url = 'https://www.maannews.net/'
 owner_info = scrape_website(url)
 print(owner_info)
