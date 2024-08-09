@@ -182,12 +182,11 @@ def scrape_website(response, url):
             contact_text += tag.get_text(separator=" ", strip=True) + " "
     
     # Analyze the extracted text
+
     if about_us_text:
         owner_info += extract_owner_from_text(about_us_text) + "\n"
     if contact_text:
         owner_info += extract_owner_from_text(contact_text) + "\n"
-    
-    
     return owner_info
 
 
@@ -196,6 +195,7 @@ for row in array_100_rows:
     url = ', '.join(map(str, row))
     print(url)
     print()
+
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
