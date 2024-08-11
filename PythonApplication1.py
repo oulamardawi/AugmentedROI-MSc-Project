@@ -1,18 +1,20 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from openai import OpenAI
+#from openai import OpenAI
 from requests.exceptions import RequestException
 import re
 from urllib.parse import urlparse
 from urllib.parse import urljoin
 import tldextract
+import os
+import google.generativeai as genai
 
 counter = 0
 counter2 = 0
 
 # Step 1: Read the Excel file
-file_path = 'C:/Users/u5580340/Desktop/DS1.xlsx'  # Replace with your file path
+file_path = 'C:/Users/u5580340/Desktop/DS2.xlsx'  # Replace with your file path
 df = pd.read_excel(file_path, header=None)
 
 # Step 2: Convert to a list of lists
@@ -23,7 +25,10 @@ array_100_rows = data[:100]
 
 
 #Initialize the client
-client = OpenAI(api_key='sk-proj-UsD2piowbm3VJb36xa5NT3BlbkFJlBtasBdYc9dxh8v9Mfyo')
+#client = OpenAI(api_key='sk-proj-UsD2piowbm3VJb36xa5NT3BlbkFJlBtasBdYc9dxh8v9Mfyo')
+api_key = "AIzaSyCADkdUuS0-za5Q5CbN4pZBOJ6i64znQwQ"
+genai.configure(api_key=api_key)
+
 
 def get_first_half(text):
     mid_index = len(text) // 2
@@ -71,8 +76,9 @@ def extract_owner_from_url(url):
 
         Website URL: {url}
 """
+###########################################################################    
 # Using the updated endpoint
-    response = client.chat.completions.create(
+    """  response = client.chat.completions.create(
         model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are an assistant that extracts owner of any domain."},
@@ -82,10 +88,31 @@ def extract_owner_from_url(url):
         temperature=0,
     )
     return response.choices[0].message.content
+"""
+    generation_config = {
+        "temperature": 1,
+        "top_p": 0.95,
+        "top_k": 64,
+        "max_output_tokens": 8192,
+        "response_mime_type": "text/plain",
+    }
 
+    model = genai.GenerativeModel(
+        model_name="gemini-1.5-flash",
+        generation_config=generation_config,
+        # safety_settings = Adjust safety settings
+        # See https://ai.google.dev/gemini-api/docs/safety-settings
+    )
+
+    chat_session = model.start_chat(history=[])
+
+    response = chat_session.send_message(prompt)
+    return response.candidates[0].content.parts[0].text
+
+########################################################################### 
 
 def extract_owner_from_text(text):
-   try:
+    try:
         print("extract_owner_from_text")
         prompt = f"""
             You are an expert in identifying and extracting ownership information from text. Please extract the name of the owner or data controller from the following text:
@@ -112,10 +139,11 @@ def extract_owner_from_text(text):
 
             ### Now, please provide the owner information for the following text:
 
-             {text}
-    """
+            {text}
+        """
 
         # Using the updated endpoint
+        """
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
@@ -126,12 +154,32 @@ def extract_owner_from_text(text):
             temperature=0,   # Ensures factual and accurate responses
         )
         return response.choices[0].message.content
-   
-   except Exception as e:
+        """
+        
+        generation_config = {
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 64,
+            "max_output_tokens": 8192,
+            "response_mime_type": "text/plain",
+        }
+
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            generation_config=generation_config,
+            # safety_settings = Adjust safety settings
+            # See https://ai.google.dev/gemini-api/docs/safety-settings
+        )
+
+        chat_session = model.start_chat(history=[])
+
+        response = chat_session.send_message(prompt)
+        return response.candidates[0].content.parts[0].text
+
+    except Exception as e:
         print(f"An error occurred")
         first_half = get_first_half(text)
         return extract_owner_from_text(first_half)
-
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------   
 def get_about_us_link(soup, url):
