@@ -12,9 +12,9 @@ import google.generativeai as genai
 
 counter = 0
 counter2 = 0
-
+domain_backUp = ""
 # Step 1: Read the Excel file
-file_path = 'C:/Users/u5580340/Desktop/DS2.xlsx'  # Replace with your file path
+file_path = 'C:/Users/u5580340/Desktop/tesst.xlsx'  # Replace with your file path
 df = pd.read_excel(file_path, header=None)
 
 # Step 2: Convert to a list of lists
@@ -395,6 +395,7 @@ for row in array_100_rows:
         print(f"Exception{counter2}")
         print(url)
         domain = extract_main_domain(url)
+        domain_backUp = domain
         print(f"domain after edit = {domain}")
         
         try:
@@ -419,7 +420,7 @@ for row in array_100_rows:
     
     print("Give GPT a try")
     owner_info = extract_owner_from_url(url)
-    owner_info += extract_owner_from_url(domain)
+    owner_info += extract_owner_from_url(domain_backUp)
     print(f"Success through url and domain as it is, sent to GPT{owner_info}")
     print("--------------------------------------------------------------------------------")
 
